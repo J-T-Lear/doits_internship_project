@@ -1,16 +1,17 @@
-import 'package:doits_internship_project/user-createdocument.dart';
+import 'package:doits_internship_project/pages/admin-userspage.dart';
+import 'package:doits_internship_project/pages/loginpage.dart';
 import 'package:flutter/material.dart';
 
-class UserDashboard extends StatefulWidget {
-  const UserDashboard({super.key, required this.title});
+class AdminDashboard extends StatefulWidget {
+  const AdminDashboard({super.key, required this.title});
 
   final String title;
 
   @override
-  State<UserDashboard> createState() => _UserDashboard();
+  State<AdminDashboard> createState() => _AdminDashboard();
 }
 
-class _UserDashboard extends State<UserDashboard> {
+class _AdminDashboard extends State<AdminDashboard> {
   int _dropdownValue = 5;
 
   final FocusNode _buttonFocusNode = FocusNode(debugLabel: 'Menu Button');
@@ -80,28 +81,7 @@ class _UserDashboard extends State<UserDashboard> {
                           Icons.refresh_rounded,
                         ),
                       ),
-                    ),
-                    const VerticalDivider(
-                      indent: 6,
-                      endIndent: 6,
-                      width: 0,
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: GestureDetector(
-                        onTap: () {
-                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const CreateDocumentPage(title: "PEO"),
-                              ));
-                        },
-                        child: const Icon(
-                          Icons.note_add,
-                        ),
-                      ),
-                    ),
+                    ), 
                     const VerticalDivider(
                       indent: 6,
                       endIndent: 6,
@@ -119,7 +99,7 @@ class _UserDashboard extends State<UserDashboard> {
                             )),
                             child: Padding(
                               padding: EdgeInsets.fromLTRB(4, 4, 20, 10),
-                              child: Text("Username",
+                              child: Text("System Admin",
                                   style: TextStyle(color: Colors.white)),
                             ),
                           ),
@@ -153,12 +133,11 @@ class _UserDashboard extends State<UserDashboard> {
                               Colors.white,
                             )),
                             onPressed: () {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(const SnackBar(
-                                content: Text("Logged Out"),
+                             Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const LoginPage(title: "PEO"),
                               ));
                             },
                             child: const Row(
@@ -268,8 +247,43 @@ class _UserDashboard extends State<UserDashboard> {
                                     ),
                                   ),
                                 )),
+                            Expanded(
+                                flex: 1,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AdminUsersPage(title: "PEO"),
+                                        ));
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Row(
+                                      children: [
+                                        Icon(
+                                          Icons.people,
+                                          color: Color.fromRGBO(
+                                              106, 109, 150, 100),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "Users",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )),
                             const Spacer(
-                              flex: 10,
+                              flex: 9,
                             ),
                           ],
                         ),
@@ -670,6 +684,7 @@ class _UserDashboard extends State<UserDashboard> {
                                   ],
                                 ),
                               ),
+                             
                               Padding(
                                 padding:
                                     const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -919,18 +934,18 @@ class _UserDashboard extends State<UserDashboard> {
                                     Expanded(
                                       flex: 3,
                                       child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            4, 0, 4, 0),
                                         child: ElevatedButton(
                                             style: ButtonStyle(
                                                 backgroundColor:
-                                                    MaterialStateProperty.all<
-                                                        Color>(Colors.white),
+                                                    MaterialStateProperty.all<Color>(
+                                                        Colors.white),
                                                 foregroundColor:
-                                                    MaterialStateProperty.all<
-                                                        Color>(Colors.white),
-                                                overlayColor:
-                                                    MaterialStateProperty.all<
-                                                        Color>(Colors.white),
+                                                    MaterialStateProperty.all<Color>(
+                                                        Colors.white),
+                                                overlayColor: MaterialStateProperty
+                                                    .all<Color>(Colors.white),
                                                 shadowColor: MaterialStateProperty
                                                     .all<Color>(Colors.white),
                                                 elevation: MaterialStateProperty
@@ -945,7 +960,7 @@ class _UserDashboard extends State<UserDashboard> {
                                             onPressed: () {
                                               ScaffoldMessenger.of(context)
                                                   .hideCurrentSnackBar();
-                                      
+
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(const SnackBar(
                                                 content: Text("Next Pressed"),

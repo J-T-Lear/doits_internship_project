@@ -1,25 +1,55 @@
-import 'package:doits_internship_project/admin-userspage.dart';
-import 'package:doits_internship_project/loginpage.dart';
+import 'package:doits_internship_project/pages/user-dashboard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
-class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key, required this.title});
+class CreateDocumentPage extends StatefulWidget {
+  const CreateDocumentPage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<AdminDashboard> createState() => _AdminDashboard();
+  State<CreateDocumentPage> createState() => _CreateDocumentPage();
 }
 
-class _AdminDashboard extends State<AdminDashboard> {
-  int _dropdownValue = 5;
+class _CreateDocumentPage extends State<CreateDocumentPage> { 
+
+  String _recipient = "Houshou Marine"; 
+  String _code = "A";
+  String _series = "3000";
+
+  DateTime? _selectedDate;
+
+  final DateTime now = DateTime.now();
+  final DateFormat formatter = DateFormat('MM/dd/yyyy');
+  String formatted = "";
+
+  void _presentDatePicker() {
+    // showDatePicker is a pre-made funtion of Flutter
+   showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime.now(),
+            lastDate: DateTime(2100))
+        .then((pickedDate) {
+      // Check if no date is selected
+      if (pickedDate == null) {
+        return;
+      }
+      setState(() {
+        // using state so that the UI will be rerendered when date is picked
+        _selectedDate = pickedDate;
+        formatted = formatter.format(pickedDate);
+      });
+    });
+  }
 
   final FocusNode _buttonFocusNode = FocusNode(debugLabel: 'Menu Button');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        children: <Widget>[
+        children: [
           Expanded(
               flex: 1,
               child: Container(
@@ -81,7 +111,28 @@ class _AdminDashboard extends State<AdminDashboard> {
                           Icons.refresh_rounded,
                         ),
                       ),
-                    ), 
+                    ),
+                    const VerticalDivider(
+                      indent: 6,
+                      endIndent: 6,
+                      width: 0,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const CreateDocumentPage(title: "PEO"),
+                              ));
+                        },
+                        child: const Icon(
+                          Icons.note_add,
+                        ),
+                      ),
+                    ),
                     const VerticalDivider(
                       indent: 6,
                       endIndent: 6,
@@ -99,7 +150,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                             )),
                             child: Padding(
                               padding: EdgeInsets.fromLTRB(4, 4, 20, 10),
-                              child: Text("System Admin",
+                              child: Text("Username",
                                   style: TextStyle(color: Colors.white)),
                             ),
                           ),
@@ -133,11 +184,12 @@ class _AdminDashboard extends State<AdminDashboard> {
                               Colors.white,
                             )),
                             onPressed: () {
-                             Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const LoginPage(title: "PEO"),
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();
+
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text("Logged Out"),
                               ));
                             },
                             child: const Row(
@@ -213,13 +265,12 @@ class _AdminDashboard extends State<AdminDashboard> {
                                 flex: 1,
                                 child: GestureDetector(
                                   onTap: () {
-                                    ScaffoldMessenger.of(context)
-                                        .hideCurrentSnackBar();
-
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
-                                      content: Text("Dashboard Pressed"),
-                                    ));
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const UserDashboard(title: "PEO"),
+                                        ));
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -247,43 +298,8 @@ class _AdminDashboard extends State<AdminDashboard> {
                                     ),
                                   ),
                                 )),
-                            Expanded(
-                                flex: 1,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AdminUsersPage(title: "PEO"),
-                                        ));
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: const Row(
-                                      children: [
-                                        Icon(
-                                          Icons.people,
-                                          color: Color.fromRGBO(
-                                              106, 109, 150, 100),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text(
-                                            "Users",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )),
                             const Spacer(
-                              flex: 9,
+                              flex: 10,
                             ),
                           ],
                         ),
@@ -299,14 +315,14 @@ class _AdminDashboard extends State<AdminDashboard> {
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white,
                           ),
-                          child: Column(
+                          child: ListView(
                             children: [
                               Container(
                                 padding:
                                     const EdgeInsets.fromLTRB(20, 10, 10, 10),
                                 alignment: Alignment.centerLeft,
                                 child: const Text(
-                                  "Dashboard",
+                                  "Create Document",
                                   style: TextStyle(
                                     color: Color.fromARGB(255, 25, 48, 100),
                                     fontSize: 26,
@@ -315,124 +331,300 @@ class _AdminDashboard extends State<AdminDashboard> {
                                 ),
                               ),
                               const Divider(
-                                height: 2,
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                                alignment: Alignment.centerLeft,
-                                child: ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            const MaterialStatePropertyAll(
-                                          Color.fromARGB(255, 25, 48, 100),
-                                        ),
-                                        shape: MaterialStatePropertyAll(
-                                            RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(2)))),
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context)
-                                          .hideCurrentSnackBar();
-
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                        content: Text("Export Pressed"),
-                                      ));
-                                    },
-                                    child: const SizedBox(
-                                      width: 48,
-                                      height: 20,
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.upload_file_rounded,
-                                            color: Colors.white,
-                                            size: 12,
-                                          ),
-                                          Text(
-                                            "Export",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12),
-                                          )
-                                        ],
-                                      ),
-                                    )),
+                                height: 20,
                               ),
                               Container(
                                 padding:
                                     const EdgeInsets.fromLTRB(20, 10, 20, 10),
                                 child: Row(
                                   children: [
-                                    const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: Text("Show"),
-                                    ),
-                                    Container(
-                                        padding: const EdgeInsets.all(4),
-                                        height: 30,
-                                        width: 60,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(2),
-                                          color: Colors
-                                              .white, //background color of dropdown button
-                                          border: Border.all(
-                                              color: Colors.black38, width: 1),
-                                        ),
-                                        child: DropdownButton<int>(
-                                            items: const [
-                                              DropdownMenuItem(
-                                                value: 5,
-                                                child: Text("5"),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 10,
-                                                child: Text("10"),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 20,
-                                                child: Text("20"),
-                                              ),
-                                            ],
-                                            value: _dropdownValue,
-                                            underline: Container(),
-                                            onChanged: (int? selectedValue) {
-                                              if (selectedValue is int) {
-                                                setState(() {
-                                                  _dropdownValue =
-                                                      selectedValue;
-                                                });
-                                              }
-                                            })),
-                                    const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: Text("entries"),
-                                    ),
-                                    const Spacer(
-                                      flex: 10,
-                                    ),
-                                    const Expanded(
+                                    Expanded(
                                       flex: 1,
-                                      child: Text("Search: "),
-                                    ),
-                                    const Expanded(
-                                        flex: 3,
-                                        child: SizedBox(
-                                          height: 30,
-                                          child: TextField(
-                                            style: TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: Colors.black),
-                                            decoration: InputDecoration(
-                                                contentPadding:
-                                                    EdgeInsets.all(4),
-                                                border: OutlineInputBorder()),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text("To"),
+                                              Container(
+                                                  padding:
+                                                      const EdgeInsets.all(4),
+                                                  height: 30,
+                                                  width: 300,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            2),
+                                                    color: Colors
+                                                        .white, //background color of dropdown button
+                                                    border: Border.all(
+                                                        color: Colors.black38,
+                                                        width: 1),
+                                                  ),
+                                                  child: DropdownButton<
+                                                          String>(
+                                                      isExpanded: true,
+                                                      items: const [
+                                                        DropdownMenuItem(
+                                                          value:
+                                                              "Houshou Marine",
+                                                          child: Text(
+                                                              "Houshou Marine"),
+                                                        ),
+                                                        DropdownMenuItem(
+                                                          value:
+                                                              "Sakamata Chloe",
+                                                          child: Text(
+                                                              "Sakamata Chloe"),
+                                                        ),
+                                                        DropdownMenuItem(
+                                                          value: "Takane Lui",
+                                                          child: Text(
+                                                              "Takane Lui"),
+                                                        ),
+                                                      ],
+                                                      value: _recipient,
+                                                      underline: Container(),
+                                                      onChanged:
+                                                          (selectedAccountType) {
+                                                        setState(() {
+                                                          _recipient =
+                                                              selectedAccountType!;
+                                                        });
+                                                      })),
+                                            ],
                                           ),
-                                        )),
+                                          const Padding(
+                                            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text("Subject"),
+                                                SizedBox(
+                                                  height: 30,
+                                                  width: 300,
+                                                  child: TextField(
+                                                    style: TextStyle(
+                                                        fontSize: 12.0,
+                                                        height: 1.0,
+                                                        color: Colors.black),
+                                                    decoration: InputDecoration(
+                                                        contentPadding:
+                                                            EdgeInsets.all(4),
+                                                        border:
+                                                            OutlineInputBorder()),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Column(
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text("Code"),
+                                              Container(
+                                                  padding:
+                                                      const EdgeInsets.all(4),
+                                                  height: 30,
+                                                  width: 300,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            2),
+                                                    color: Colors
+                                                        .white, //background color of dropdown button
+                                                    border: Border.all(
+                                                        color: Colors.black38,
+                                                        width: 1),
+                                                  ),
+                                                  child: DropdownButton<
+                                                          String>(
+                                                      isExpanded: true,
+                                                      items: const [
+                                                        DropdownMenuItem(
+                                                          value: "A",
+                                                          child: Text("A"),
+                                                        ),
+                                                        DropdownMenuItem(
+                                                          value: "B",
+                                                          child: Text("B"),
+                                                        ),
+                                                        DropdownMenuItem(
+                                                          value: "C",
+                                                          child: Text("C"),
+                                                        ),
+                                                      ],
+                                                      value: _code,
+                                                      underline: Container(),
+                                                      onChanged:
+                                                          (selectedAccountType) {
+                                                        setState(() {
+                                                          _code =
+                                                              selectedAccountType!;
+                                                        });
+                                                      })),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Text("Series"),
+                                                Container(
+                                                    width: 300,
+                                                    height: 30,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              2),
+                                                      color: Colors
+                                                          .white, //background color of dropdown button
+                                                      border: Border.all(
+                                                          color: Colors.black38,
+                                                          width: 1),
+                                                    ),
+                                                    child: DropdownButton<String>(
+                                                        isExpanded: true,
+                                                        items: const [
+                                                          DropdownMenuItem(
+                                                            value: "1000",
+                                                            child: Text("1000"),
+                                                          ),
+                                                          DropdownMenuItem(
+                                                            value: "2000",
+                                                            child: Text("2000"),
+                                                          ),
+                                                          DropdownMenuItem(
+                                                            value: "3000",
+                                                            child: Text("3000"),
+                                                          ),
+                                                        ],
+                                                        value: _series,
+                                                        underline: Container(),
+                                                        onChanged:
+                                                            (selectedAccountType) {
+                                                          setState(() {
+                                                            _series =
+                                                                selectedAccountType!;
+                                                          });
+                                                        })),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 60),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start, 
+                                            children: [
+                                              const Text("Due Date"),
+                                              GestureDetector(
+                                                onTap: _presentDatePicker,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              2),
+                                                      border: Border.all(
+                                                        width: .5,
+                                                      )),
+                                                  height: 30,
+                                                  width: 300,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.fromLTRB(8, 2, 8, 2),
+                                                    child: Row(
+                                                      children: [
+                                                        Text(
+                                                            _selectedDate != null
+                                                                ? formatted
+                                                                : formatter
+                                                                    .format(now),
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        12.0,
+                                                                    height: 1.0,
+                                                                    color: Colors
+                                                                        .black)),
+                                                        const Spacer(
+                                                          flex: 1,
+                                                        ),
+                                                        const Icon(
+                                                          Icons.calendar_today,
+                                                          size: 12,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              
+                                            ],
+                                          ),
+                                        ))
                                   ],
+                                ),
+                              ),
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                child: const Column(
+                                  children: [
+                                    Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text("Description: ")),
+                                    TextField(
+                                      keyboardType: TextInputType.multiline,
+                                      minLines:
+                                          5, // Normal textInputField will be displayed
+                                      maxLines: 5, //
+                                      style: TextStyle(
+                                          fontSize: 12.0,
+                                          height: 1.0,
+                                          color: Colors.black),
+                                      decoration: InputDecoration(
+                                        contentPadding:
+                                            EdgeInsets.fromLTRB(6, 10, 6, 10),
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Divider(
+                                height: 20,
+                              ),
+                              Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 10, 10, 10),
+                                alignment: Alignment.centerLeft,
+                                child: const Text(
+                                  "Files Attached",
+                                  style: TextStyle(
+                                    color: Color.fromARGB(255, 25, 48, 100),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                               Padding(
@@ -668,7 +860,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                    const EdgeInsets.fromLTRB(20, 0, 20, 20),
                                 child: Row(
                                   children: [
                                     Expanded(
@@ -684,299 +876,90 @@ class _AdminDashboard extends State<AdminDashboard> {
                                   ],
                                 ),
                               ),
-                             
-                              Padding(
+                               Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      flex: 1,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
+                                    const EdgeInsets.fromLTRB(20, 0, 20, 40),
+                                child: ElevatedButton(
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            const MaterialStatePropertyAll(
+                                          Color.fromARGB(255, 25, 48, 100),
                                         ),
-                                        child: const Text(
-                                          "ID",
+                                        shape: MaterialStatePropertyAll(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(2)))),
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context)
+                                          .hideCurrentSnackBar();
+
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text("Attach File Pressed"),
+                                      ));
+                                    },
+                                    child: const Row(
+                                      mainAxisAlignment:MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.attach_file,
+                                          color: Colors.white,
+                                          size: 12,
+                                        ),
+                                        Text(
+                                          "Attach file",
                                           style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "DoITS",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "Action",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "Remarks",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "Other Remarks",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "Description",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                              color: Colors.white,
+                                              fontSize: 12),
+                                        )
+                                      ],
+                                    )),
+                              ),
+                              const Divider(
+                                height: 12,
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                child: Row(
-                                  children: [
-                                    const Expanded(
-                                        flex: 8,
-                                        child: Text(
-                                            "Showing 0 to 0 of 0 entries")),
-                                    const Spacer(
-                                      flex: 18,
-                                    ),
-                                    Expanded(
-                                      flex: 4,
-                                      child: ElevatedButton(
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.white),
-                                              foregroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.white),
-                                              overlayColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.white),
-                                              shadowColor: MaterialStateProperty
-                                                  .all<Color>(Colors.white),
-                                              elevation: MaterialStateProperty
-                                                  .all<double>(0.1),
-                                              shape: MaterialStatePropertyAll(
-                                                  RoundedRectangleBorder(
-                                                      side: const BorderSide(
-                                                          width: 1, // thickness
-                                                          color: Colors.grey // color
-                                                          ),
-                                                      borderRadius: BorderRadius.circular(2)))),
-                                          onPressed: () {
-                                            ScaffoldMessenger.of(context)
-                                                .hideCurrentSnackBar();
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 0, 20, 40),
+                                child: ElevatedButton(
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            const MaterialStatePropertyAll(
+                                          Color.fromARGB(255, 25, 48, 100),
+                                        ),
+                                        shape: MaterialStatePropertyAll(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(2)))),
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context)
+                                          .hideCurrentSnackBar();
 
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                              content: Text("Previous Pressed"),
-                                            ));
-                                          },
-                                          child: const Text(
-                                            "Previous",
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text("Save Pressed"),
+                                      ));
+                                    },
+                                    child: const SizedBox(
+                                      width: 48,
+                                      height: 20,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.save,
+                                            color: Colors.white,
+                                            size: 12,
+                                          ),
+                                          Text(
+                                            "Save",
                                             style: TextStyle(
-                                                color: Colors.black,
+                                                color: Colors.white,
                                                 fontSize: 12),
-                                          )),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            4, 0, 4, 0),
-                                        child: ElevatedButton(
-                                            style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty.all<Color>(
-                                                        Colors.white),
-                                                foregroundColor:
-                                                    MaterialStateProperty.all<Color>(
-                                                        Colors.white),
-                                                overlayColor: MaterialStateProperty
-                                                    .all<Color>(Colors.white),
-                                                shadowColor: MaterialStateProperty
-                                                    .all<Color>(Colors.white),
-                                                elevation: MaterialStateProperty
-                                                    .all<double>(0.1),
-                                                shape: MaterialStatePropertyAll(
-                                                    RoundedRectangleBorder(
-                                                        side: const BorderSide(
-                                                            width: 1, // thickness
-                                                            color: Colors.grey // color
-                                                            ),
-                                                        borderRadius: BorderRadius.circular(2)))),
-                                            onPressed: () {
-                                              ScaffoldMessenger.of(context)
-                                                  .hideCurrentSnackBar();
-
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(const SnackBar(
-                                                content: Text("Next Pressed"),
-                                              ));
-                                            },
-                                            child: const Text(
-                                              "Next",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                              ),
-                                            )),
+                                          )
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
+                                    )),
+                              ),
                             ],
                           ),
                         )),

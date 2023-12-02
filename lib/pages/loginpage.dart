@@ -1,5 +1,5 @@
 
-import 'package:doits_internship_project/user-dashboard.dart';
+import 'package:doits_internship_project/pages/user-dashboard.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {

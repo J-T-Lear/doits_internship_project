@@ -1,19 +1,19 @@
 //project pages
-import 'package:doits_internship_project/loginpage.dart';
-// import 'package:doits_internship_project/user-createdocument.dart';
-// import 'package:doits_internship_project/user-dashboard.dart';
-// import 'package:doits_internship_project/loginpage.dart';
-// import 'package:doits_internship_project/admin-usercreatepage.dart';
-// import 'package:doits_internship_project/admin-dashboard.dart';
-// import 'package:doits_internship_project/admin-usercreatepage.dart';
-// import 'package:doits_internship_project/admin-userspage.dart';
+import 'package:doits_internship_project/pages/loginpage.dart';
+// import 'package:doits_internship_project/pages/user-createdocument.dart';
+// import 'package:doits_internship_project/pages/user-dashboard.dart';
+// import 'package:doits_internship_project/pages/loginpage.dart';
+// import 'package:doits_internship_project/pages/admin-usercreatepage.dart';
+// import 'package:doits_internship_project/pages/admin-dashboard.dart';
+// import 'package:doits_internship_project/pages/admin-usercreatepage.dart';
+// import 'package:doits_internship_project/pages/admin-userspage.dart';
 
 //flutter stuff
 import 'package:flutter/material.dart';
 
 //firebase stuff
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:doits_internship_project/firebase_options.dart';
 
 Future<void> main() async {
   await Firebase.initializeApp(

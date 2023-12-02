@@ -1,6 +1,6 @@
-import 'package:doits_internship_project/admin-dashboard.dart';
-import 'package:doits_internship_project/admin-userspage.dart';
-import 'package:doits_internship_project/loginpage.dart'; 
+import 'package:doits_internship_project/pages/admin-dashboard.dart';
+import 'package:doits_internship_project/pages/admin-userspage.dart';
+import 'package:doits_internship_project/pages/loginpage.dart'; 
 import 'package:flutter/material.dart';
 
 class AdminCreateUserPage extends StatefulWidget {
