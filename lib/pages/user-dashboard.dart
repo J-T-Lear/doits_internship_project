@@ -1,9 +1,11 @@
+import 'package:doits_internship_project/pages/loginpage.dart';
 import 'package:doits_internship_project/pages/user-createdocument.dart';
 import 'package:flutter/material.dart';
 
 class UserDashboard extends StatefulWidget {
-  const UserDashboard({super.key, required this.title});
+  const UserDashboard({super.key, required this.title, required this.username});
 
+  final String username;
   final String title;
 
   @override
@@ -94,7 +96,7 @@ class _UserDashboard extends State<UserDashboard> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const CreateDocumentPage(title: "PEO"),
+                                    CreateDocumentPage(title: "PEO", username: widget.username),
                               ));
                         },
                         child: const Icon(
@@ -112,15 +114,15 @@ class _UserDashboard extends State<UserDashboard> {
                       child: MenuAnchor(
                         childFocusNode: _buttonFocusNode,
                         menuChildren: <Widget>[
-                          const MenuItemButton(
-                            style: ButtonStyle(
+                          MenuItemButton(
+                            style: const ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(
                               Color.fromARGB(255, 25, 48, 100),
                             )),
                             child: Padding(
-                              padding: EdgeInsets.fromLTRB(4, 4, 20, 10),
-                              child: Text("Username",
-                                  style: TextStyle(color: Colors.white)),
+                              padding: const EdgeInsets.fromLTRB(4, 4, 20, 10),
+                              child: Text(widget.username,
+                                  style: const TextStyle(color: Colors.white)),
                             ),
                           ),
                           MenuItemButton(
@@ -153,12 +155,11 @@ class _UserDashboard extends State<UserDashboard> {
                               Colors.white,
                             )),
                             onPressed: () {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(const SnackBar(
-                                content: Text("Logged Out"),
+                              Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const LoginPage(title: "PEO"),
                               ));
                             },
                             child: const Row(

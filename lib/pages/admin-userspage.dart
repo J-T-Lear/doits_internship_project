@@ -1,11 +1,14 @@
 import 'package:doits_internship_project/pages/admin-dashboard.dart';
 import 'package:doits_internship_project/pages/admin-usercreatepage.dart';
-import 'package:doits_internship_project/pages/loginpage.dart'; 
+import 'package:doits_internship_project/pages/loginpage.dart';
+import 'package:doits_internship_project/functions.dart';
 import 'package:flutter/material.dart';
 
 class AdminUsersPage extends StatefulWidget {
-  const AdminUsersPage({super.key, required this.title});
+  const AdminUsersPage(
+      {super.key, required this.title, required this.username});
 
+  final String username;
   final String title;
 
   @override
@@ -14,6 +17,12 @@ class AdminUsersPage extends StatefulWidget {
 
 class _AdminUsersPage extends State<AdminUsersPage> {
   int _dropdownValue = 5;
+
+  String searchcategory = "name";
+  String searchkey = "";
+  String selecteduser = "";
+
+  bool searchon = false;
 
   final FocusNode _buttonFocusNode = FocusNode(debugLabel: 'Menu Button');
   @override
@@ -87,21 +96,21 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                       indent: 6,
                       endIndent: 6,
                       width: 0,
-                    ), 
+                    ),
                     Expanded(
                       flex: 2,
                       child: MenuAnchor(
                         childFocusNode: _buttonFocusNode,
                         menuChildren: <Widget>[
-                          const MenuItemButton(
-                            style: ButtonStyle(
+                          MenuItemButton(
+                            style: const ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(
                               Color.fromARGB(255, 25, 48, 100),
                             )),
                             child: Padding(
-                              padding: EdgeInsets.fromLTRB(4, 4, 20, 10),
-                              child: Text("System Admin",
-                                  style: TextStyle(color: Colors.white)),
+                              padding: const EdgeInsets.fromLTRB(4, 4, 20, 10),
+                              child: Text(widget.username,
+                                  style: const TextStyle(color: Colors.white)),
                             ),
                           ),
                           MenuItemButton(
@@ -217,9 +226,9 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AdminDashboard(
-                                                  title: "PEO"),
+                                          builder: (context) => AdminDashboard(
+                                              title: "PEO",
+                                              username: widget.username),
                                         ));
                                   },
                                   child: Container(
@@ -338,8 +347,9 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                const AdminCreateUserPage(
-                                                    title: "PEO"),
+                                                AdminCreateUserPage(
+                                                    title: "PEO",
+                                                    username: widget.username),
                                           ));
                                     },
                                     child: const SizedBox(
@@ -434,6 +444,29 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                                 border: OutlineInputBorder()),
                                           ),
                                         )),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                        child: searchon
+                                            ? ElevatedButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    searchon = false;
+                                                  });
+                                                },
+                                                child: const Icon(Icons.clear))
+                                            : ElevatedButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    searchon = true;
+                                                  });
+                                                },
+                                                child:
+                                                    const Icon(Icons.search)),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -444,43 +477,6 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Expanded(
-                                      flex: 1,
-                                      child: Container(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              12, 10, 4, 10),
-                                          decoration: const BoxDecoration(
-                                            border: Border(
-                                              top: BorderSide(
-                                                  width: 2,
-                                                  color: Color.fromARGB(
-                                                      255, 207, 216, 220)),
-                                              left: BorderSide(
-                                                  width: 1,
-                                                  color: Color.fromARGB(
-                                                      255, 207, 216, 220)),
-                                              bottom: BorderSide(
-                                                  width: 3,
-                                                  color: Color.fromARGB(
-                                                      255, 207, 216, 220)),
-                                            ),
-                                          ),
-                                          child: const Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                "ID",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color.fromARGB(
-                                                      255, 25, 48, 100),
-                                                ),
-                                              ),
-                                              Icon(Icons.import_export),
-                                            ],
-                                          )),
-                                    ),
-                                    Expanded(
                                       flex: 6,
                                       child: Container(
                                           padding: const EdgeInsets.fromLTRB(
@@ -594,68 +590,75 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                   ],
                                 ),
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        height: 40,
-                                        color: const Color.fromARGB(
-                                            255, 226, 233, 236),
-                                        child: const Center(
-                                            child: Text(
-                                                "No Data Available in Table")),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+
+
+
+                              Expanded(
+                                flex: 4,
+                                child: searchon
+                                    ? StreamBuilder<List<User>>(
+                                        stream: searchUsers(
+                                            searchcategory: searchcategory,
+                                            searchkey: searchkey),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasError) {
+                                            print(snapshot.error);
+                                            return const Text(
+                                                'Something went wrong');
+                                          }
+                                          if (snapshot.hasData) {
+                                            final users = snapshot.data!;
+                                
+                                            return ListView(
+                                              scrollDirection: Axis.vertical,
+                                              shrinkWrap: true,
+                                              children: users
+                                                  .map(buildUserTile)
+                                                  .toList(),
+                                            );
+                                          } else {
+                                            return const Center(
+                                                child:
+                                                    CircularProgressIndicator());
+                                          }
+                                        })
+                                    : StreamBuilder<List<User>>(
+                                        stream: readUsers(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasError) {
+                                            print(snapshot.error);
+                                            return const Text(
+                                                'Something went wrong');
+                                          }
+                                          if (snapshot.hasData) {
+                                            final users = snapshot.data!;
+                                
+                                            return buildUsersListView(users, context, widget.username);
+                                          
+                                            // return ListView(
+                                            //   scrollDirection: Axis.vertical,
+                                            //   shrinkWrap: true,
+                                            //   children: users
+                                            //       .map(buildUserTile)
+                                            //       .toList(),
+                                            // );
+                                          } else {
+                                            return const Center(
+                                                child:
+                                                    CircularProgressIndicator());
+                                          }
+                                        }),
                               ),
+
+
+
+                              
                               Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Expanded(
-                                      flex: 1,
-                                      child: Container(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              12, 10, 4, 10),
-                                          decoration: const BoxDecoration(
-                                            border: Border(
-                                              top: BorderSide(
-                                                  width: 2,
-                                                  color: Color.fromARGB(
-                                                      255, 207, 216, 220)),
-                                              left: BorderSide(
-                                                  width: 1,
-                                                  color: Color.fromARGB(
-                                                      255, 207, 216, 220)),
-                                              bottom: BorderSide(
-                                                  width: 3,
-                                                  color: Color.fromARGB(
-                                                      255, 207, 216, 220)),
-                                            ),
-                                          ),
-                                          child: const Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                "ID",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color.fromARGB(
-                                                      255, 25, 48, 100),
-                                                ),
-                                              ),
-                                              Icon(Icons.import_export),
-                                            ],
-                                          )),
-                                    ),
-                                    Expanded(
                                       flex: 6,
                                       child: Container(
                                           padding: const EdgeInsets.fromLTRB(
@@ -676,21 +679,14 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                                       255, 207, 216, 220)),
                                             ),
                                           ),
-                                          child: const Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
+                                          child: const Text(
                                                 "Name",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
                                                       255, 25, 48, 100),
                                                 ),
-                                              ),
-                                              Icon(Icons.import_export),
-                                            ],
-                                          )),
+                                              ),),
                                     ),
                                     Expanded(
                                       flex: 2,
@@ -713,21 +709,14 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                                       255, 207, 216, 220)),
                                             ),
                                           ),
-                                          child: const Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
+                                          child: const Text(
                                                 "Account Type",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
                                                       255, 25, 48, 100),
                                                 ),
-                                              ),
-                                              Icon(Icons.import_export),
-                                            ],
-                                          )),
+                                              ),),
                                     ),
                                     Expanded(
                                       flex: 2,
@@ -750,27 +739,21 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                                       255, 207, 216, 220)),
                                             ),
                                           ),
-                                          child: const Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
+                                          child: const Text(
                                                 "Department",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
                                                       255, 25, 48, 100),
                                                 ),
-                                              ),
-                                              Icon(Icons.import_export),
-                                            ],
-                                          )),
+                                              ),),
                                     ),
                                   ],
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 10, 20, 10),
                                 child: Row(
                                   children: [
                                     const Expanded(

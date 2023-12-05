@@ -4,8 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 class CreateDocumentPage extends StatefulWidget {
-  const CreateDocumentPage({super.key, required this.title});
+  const CreateDocumentPage({super.key, required this.title, required this.username});
 
+  final String username;
   final String title;
 
   @override
@@ -125,7 +126,7 @@ class _CreateDocumentPage extends State<CreateDocumentPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const CreateDocumentPage(title: "PEO"),
+                                    CreateDocumentPage(title: "PEO", username: widget.username),
                               ));
                         },
                         child: const Icon(
@@ -269,7 +270,7 @@ class _CreateDocumentPage extends State<CreateDocumentPage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              const UserDashboard(title: "PEO"),
+                                              UserDashboard(title: "PEO", username: widget.username),
                                         ));
                                   },
                                   child: Container(

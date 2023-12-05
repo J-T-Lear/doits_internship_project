@@ -3,8 +3,9 @@ import 'package:doits_internship_project/pages/loginpage.dart';
 import 'package:flutter/material.dart';
 
 class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key, required this.title});
+  const AdminDashboard({super.key, required this.title, required this.username});
 
+  final String username;
   final String title;
 
   @override
@@ -92,15 +93,15 @@ class _AdminDashboard extends State<AdminDashboard> {
                       child: MenuAnchor(
                         childFocusNode: _buttonFocusNode,
                         menuChildren: <Widget>[
-                          const MenuItemButton(
-                            style: ButtonStyle(
+                           MenuItemButton(
+                            style: const ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(
                               Color.fromARGB(255, 25, 48, 100),
                             )),
                             child: Padding(
-                              padding: EdgeInsets.fromLTRB(4, 4, 20, 10),
-                              child: Text("System Admin",
-                                  style: TextStyle(color: Colors.white)),
+                              padding: const EdgeInsets.fromLTRB(4, 4, 20, 10),
+                              child: Text(widget.username,
+                                  style: const TextStyle(color: Colors.white)),
                             ),
                           ),
                           MenuItemButton(
@@ -255,7 +256,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              const AdminUsersPage(title: "PEO"),
+                                              AdminUsersPage(title: "PEO", username: widget.username),
                                         ));
                                   },
                                   child: Container(
@@ -881,7 +882,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                                 child: Row(
                                   children: [
                                     const Expanded(

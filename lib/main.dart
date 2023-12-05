@@ -1,4 +1,5 @@
 //project pages
+import 'package:doits_internship_project/pages/admin-userspage.dart';
 import 'package:doits_internship_project/pages/loginpage.dart';
 // import 'package:doits_internship_project/pages/user-createdocument.dart';
 // import 'package:doits_internship_project/pages/user-dashboard.dart';
@@ -35,7 +36,8 @@ class MyApp extends StatelessWidget {
             ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 255, 255, 255)),
         useMaterial3: true,
       ),
-      home: const LoginPage(title: 'PEO'),
+      home: const AdminUsersPage(title: "PEO", username: "Peter Parker"),
+      // const LoginPage(title: 'PEO'),
     );
   }
 }

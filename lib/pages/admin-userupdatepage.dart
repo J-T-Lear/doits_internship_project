@@ -4,26 +4,33 @@ import 'package:doits_internship_project/pages/loginpage.dart';
 import 'package:doits_internship_project/functions.dart';
 import 'package:flutter/material.dart';
 
-class AdminCreateUserPage extends StatefulWidget {
-  const AdminCreateUserPage(
-      {super.key, required this.title, required this.username});
+class AdminUpdateUserPage extends StatefulWidget {
+  const AdminUpdateUserPage(
+      {super.key, required this.username, required this.user});
 
   final String username;
-  final String title;
+  final User user;
 
   @override
-  State<AdminCreateUserPage> createState() => _AdminCreateUserPage();
+  State<AdminUpdateUserPage> createState() => _AdminUpdateUserPage();
 }
 
-class _AdminCreateUserPage extends State<AdminCreateUserPage> {
+class _AdminUpdateUserPage extends State<AdminUpdateUserPage> {
   final _formkey = GlobalKey<FormState>();
-  final nameController = TextEditingController();
-  final emailController = TextEditingController();
+  var nameController = TextEditingController();
+  var emailController = TextEditingController();
   String _accountType = "Standard";
   String _accountDepartment = "Maintenance";
 
   final FocusNode _buttonFocusNode = FocusNode(debugLabel: 'Menu Button');
   @override
+  void initState() {
+    nameController = TextEditingController(text: widget.user.name);
+    emailController = TextEditingController(text: widget.user.email);
+
+    super.initState();
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
@@ -317,7 +324,7 @@ class _AdminCreateUserPage extends State<AdminCreateUserPage> {
                                       const EdgeInsets.fromLTRB(20, 10, 10, 10),
                                   alignment: Alignment.centerLeft,
                                   child: const Text(
-                                    "Create User",
+                                    "Update User",
                                     style: TextStyle(
                                       color: Color.fromARGB(255, 25, 48, 100),
                                       fontSize: 26,
@@ -486,60 +493,112 @@ class _AdminCreateUserPage extends State<AdminCreateUserPage> {
                                   padding: const EdgeInsets.fromLTRB(
                                       150, 20, 150, 10),
                                   alignment: Alignment.centerRight,
-                                  child: ElevatedButton(
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              const MaterialStatePropertyAll(
-                                            Color.fromARGB(255, 25, 48, 100),
-                                          ),
-                                          shape: MaterialStatePropertyAll(
-                                              RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          2)))),
-                                      onPressed: () {
-                                        if (_formkey.currentState!.validate()) {
-                                          createUser(
-                                              context: context,
-                                              name: nameController.text,
-                                              email: emailController.text,
-                                              password: "defaultpassword",
-                                              department: _accountDepartment,
-                                              usertype: _accountType);
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+                                        child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                const MaterialStatePropertyAll(
+                                              Color.fromARGB(255, 25, 48, 100),
+                                            ),
+                                            shape: MaterialStatePropertyAll(
+                                                RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            2)))),
+                                        onPressed: () {
+                                          if (_formkey.currentState!.validate()) {
+                                            deleteUser(userid: widget.user.id);
+                                       
+                                      
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AdminUsersPage(
+                                                    title: "PEO",
+                                                    username: widget.username,
+                                                  ),
+                                                ));
+                                            ScaffoldMessenger.of(context)
+                                                .hideCurrentSnackBar();
+                                      
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                              content: Text("User Deleted"),
+                                            ));
+                                          }
+                                       
+                                        },
+                                        child: const Text(
+                                          "Delete User",
+                                          style: TextStyle(
+                                              color: Colors.white, fontSize: 12),
+                                        )),
+                                      ),
 
-                                          nameController.clear();
-                                          emailController.clear();
-                                          _accountType = "Standard";
-                                          _accountDepartment = "Maintenance";
 
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    AdminUsersPage(
-                                                  title: "PEO",
-                                                  username: widget.username,
-                                                ),
+
+                                      ElevatedButton(
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  const MaterialStatePropertyAll(
+                                                Color.fromARGB(
+                                                    255, 25, 48, 100),
+                                              ),
+                                              shape: MaterialStatePropertyAll(
+                                                  RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              2)))),
+                                          onPressed: () {
+                                            if (_formkey.currentState!
+                                                .validate()) {
+                                              updateUser(
+                                                  context: context,
+                                                  id: widget.user.id,
+                                                  name: nameController.text,
+                                                  email: emailController.text,
+                                                  department:
+                                                      _accountDepartment,
+                                                  usertype: _accountType);
+
+                                              nameController.clear();
+                                              emailController.clear();
+                                              _accountType = "Standard";
+                                              _accountDepartment =
+                                                  "Maintenance";
+
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AdminUsersPage(
+                                                      title: "PEO",
+                                                      username: widget.username,
+                                                    ),
+                                                  ));
+                                              ScaffoldMessenger.of(context)
+                                                  .hideCurrentSnackBar();
+
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(const SnackBar(
+                                                content: Text("User Updated"),
                                               ));
-                                          ScaffoldMessenger.of(context)
-                                              .hideCurrentSnackBar();
-
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(const SnackBar(
-                                            content: Text("User Created"),
-                                          ));
-                                        }
-
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(const SnackBar(
-                                          content: Text("User Created"),
-                                        ));
-                                      },
-                                      child: const Text(
-                                        "Create User",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 12),
-                                      )),
+                                            }
+ 
+                                          },
+                                          child: const Text(
+                                            "Update User",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12),
+                                          )),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -553,3 +612,6 @@ class _AdminCreateUserPage extends State<AdminCreateUserPage> {
     );
   }
 }
+
+
+// Widget buildUpdateUserForm(BuildContext context, User user) =>

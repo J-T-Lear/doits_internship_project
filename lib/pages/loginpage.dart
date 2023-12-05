@@ -1,5 +1,4 @@
-
-import 'package:doits_internship_project/pages/user-dashboard.dart';
+import 'package:doits_internship_project/functions.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,6 +19,7 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPage();
 }
 
+//opted to not use firebaseAuth for now since it would make testing the app more cumbersome
 class _LoginPage extends State<LoginPage> {
   final _formkey = GlobalKey<FormState>();
 
@@ -118,19 +118,26 @@ class _LoginPage extends State<LoginPage> {
                   child: ElevatedButton(
                       onPressed: () {
                         if (_formkey.currentState!.validate()) {
-                          passwordController.clear();
-                          emailController.clear();
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const UserDashboard(title: "PEO"),
-                              ));
+                          checkIfUserExists(userEmail: emailController.text)
+                              .then((truth) {
+                            if (truth == true) {
+                              loginUser(
+                                  useremail: emailController.text,
+                                  userpassword: passwordController.text,
+                                  buildcontext: context);
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Account does not exist'),
+                                ),
+                              );
 
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(
-                            content: Text("Logged In"),
-                          ));
+                              emailController.clear(); 
+                              passwordController.clear();
+                            }
+                          });
                         }
                       },
                       child: const Text("Login")),
