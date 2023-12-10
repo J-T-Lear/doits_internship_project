@@ -16,13 +16,16 @@ class AdminUsersPage extends StatefulWidget {
 }
 
 class _AdminUsersPage extends State<AdminUsersPage> {
-  int _dropdownValue = 5;
+  String _dropdownValue = "name";
 
   String searchcategory = "name";
   String searchkey = "";
   String selecteduser = "";
 
   bool searchon = false;
+
+  
+  final searchkeycontroller = TextEditingController();
 
   final FocusNode _buttonFocusNode = FocusNode(debugLabel: 'Menu Button');
   @override
@@ -377,68 +380,70 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                     const EdgeInsets.fromLTRB(20, 10, 20, 10),
                                 child: Row(
                                   children: [
-                                    const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: Text("Show"),
-                                    ),
-                                    Container(
-                                        padding: const EdgeInsets.all(4),
-                                        height: 30,
-                                        width: 60,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(2),
-                                          color: Colors
-                                              .white, //background color of dropdown button
-                                          border: Border.all(
-                                              color: Colors.black38, width: 1),
-                                        ),
-                                        child: DropdownButton<int>(
-                                            items: const [
-                                              DropdownMenuItem(
-                                                value: 5,
-                                                child: Text("5"),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 10,
-                                                child: Text("10"),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 20,
-                                                child: Text("20"),
-                                              ),
-                                            ],
-                                            value: _dropdownValue,
-                                            underline: Container(),
-                                            onChanged: (int? selectedValue) {
-                                              if (selectedValue is int) {
-                                                setState(() {
-                                                  _dropdownValue =
-                                                      selectedValue;
-                                                });
-                                              }
-                                            })),
-                                    const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: Text("entries"),
-                                    ),
+                                    
                                     const Spacer(
                                       flex: 10,
                                     ),
+                                    const Padding(
+                                      padding: EdgeInsets.all(4.0),
+                                      child: Text("Search Catergory"),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                      child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          height: 30,
+                                          width: 120,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(2),
+                                            color: Colors
+                                                .white, //background color of dropdown button
+                                            border: Border.all(
+                                                color: Colors.black38, width: 1),
+                                          ),
+                                          child: DropdownButton<String>(
+                                            isExpanded: true,
+                                              items: const [
+                                                DropdownMenuItem(
+                                                  value: "name",
+                                                  child: Text("Name"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "usertype",
+                                                  child: Text("Account Type"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "department",
+                                                  child: Text("Department"),
+                                                ),
+                                              ],
+                                              value: _dropdownValue,
+                                              underline: Container(),
+                                              onChanged: (String? searchcategory) {
+                                                if (searchcategory is String) {
+                                                  setState(() {
+                                                    _dropdownValue =
+                                                        searchcategory;
+                                                  });
+                                                }
+                                              })),
+                                    ), 
                                     const Expanded(
                                       flex: 1,
                                       child: Text("Search: "),
                                     ),
-                                    const Expanded(
+                                    Expanded(
                                         flex: 3,
                                         child: SizedBox(
                                           height: 30,
-                                          child: TextField(
-                                            style: TextStyle(
+                                          child: TextFormField(
+                                            controller: searchkeycontroller,
+                                            style: const TextStyle(
                                                 fontSize: 12.0,
                                                 height: 1.0,
                                                 color: Colors.black),
-                                            decoration: InputDecoration(
+                                            decoration: const InputDecoration(
                                                 contentPadding:
                                                     EdgeInsets.all(4),
                                                 border: OutlineInputBorder()),
@@ -453,6 +458,8 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                             ? ElevatedButton(
                                                 onPressed: () {
                                                   setState(() {
+                                                    _dropdownValue = "name";
+                                                    searchkeycontroller.text = "";
                                                     searchon = false;
                                                   });
                                                 },
@@ -460,6 +467,8 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                             : ElevatedButton(
                                                 onPressed: () {
                                                   setState(() {
+                                                    searchcategory = _dropdownValue;
+                                                    searchkey = searchkeycontroller.text; 
                                                     searchon = true;
                                                   });
                                                 },
@@ -597,9 +606,7 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                 flex: 4,
                                 child: searchon
                                     ? StreamBuilder<List<User>>(
-                                        stream: searchUsers(
-                                            searchcategory: searchcategory,
-                                            searchkey: searchkey),
+                                        stream: searchUsers(searchcategory: searchcategory, searchkey: searchkey),
                                         builder: (context, snapshot) {
                                           if (snapshot.hasError) {
                                             print(snapshot.error);
@@ -609,13 +616,8 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                           if (snapshot.hasData) {
                                             final users = snapshot.data!;
                                 
-                                            return ListView(
-                                              scrollDirection: Axis.vertical,
-                                              shrinkWrap: true,
-                                              children: users
-                                                  .map(buildUserTile)
-                                                  .toList(),
-                                            );
+                                            return buildUsersListView(users, context, widget.username);
+                                           
                                           } else {
                                             return const Center(
                                                 child:
@@ -634,14 +636,7 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                             final users = snapshot.data!;
                                 
                                             return buildUsersListView(users, context, widget.username);
-                                          
-                                            // return ListView(
-                                            //   scrollDirection: Axis.vertical,
-                                            //   shrinkWrap: true,
-                                            //   children: users
-                                            //       .map(buildUserTile)
-                                            //       .toList(),
-                                            // );
+                                           
                                           } else {
                                             return const Center(
                                                 child:
@@ -654,7 +649,7 @@ class _AdminUsersPage extends State<AdminUsersPage> {
 
                               
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -751,104 +746,8 @@ class _AdminUsersPage extends State<AdminUsersPage> {
                                   ],
                                 ),
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                child: Row(
-                                  children: [
-                                    const Expanded(
-                                        flex: 8,
-                                        child: Text(
-                                            "Showing 0 to 0 of 0 entries")),
-                                    const Spacer(
-                                      flex: 18,
-                                    ),
-                                    Expanded(
-                                      flex: 4,
-                                      child: ElevatedButton(
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.white),
-                                              foregroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.white),
-                                              overlayColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.white),
-                                              shadowColor: MaterialStateProperty
-                                                  .all<Color>(Colors.white),
-                                              elevation: MaterialStateProperty
-                                                  .all<double>(0.1),
-                                              shape: MaterialStatePropertyAll(
-                                                  RoundedRectangleBorder(
-                                                      side: const BorderSide(
-                                                          width: 1, // thickness
-                                                          color: Colors.grey // color
-                                                          ),
-                                                      borderRadius: BorderRadius.circular(2)))),
-                                          onPressed: () {
-                                            ScaffoldMessenger.of(context)
-                                                .hideCurrentSnackBar();
+ 
 
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                              content: Text("Previous Pressed"),
-                                            ));
-                                          },
-                                          child: const Text(
-                                            "Previous",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12),
-                                          )),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            4, 0, 4, 0),
-                                        child: ElevatedButton(
-                                            style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty.all<Color>(
-                                                        Colors.white),
-                                                foregroundColor:
-                                                    MaterialStateProperty.all<Color>(
-                                                        Colors.white),
-                                                overlayColor: MaterialStateProperty
-                                                    .all<Color>(Colors.white),
-                                                shadowColor: MaterialStateProperty
-                                                    .all<Color>(Colors.white),
-                                                elevation: MaterialStateProperty
-                                                    .all<double>(0.1),
-                                                shape: MaterialStatePropertyAll(
-                                                    RoundedRectangleBorder(
-                                                        side: const BorderSide(
-                                                            width: 1, // thickness
-                                                            color: Colors.grey // color
-                                                            ),
-                                                        borderRadius: BorderRadius.circular(2)))),
-                                            onPressed: () {
-                                              ScaffoldMessenger.of(context)
-                                                  .hideCurrentSnackBar();
-
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(const SnackBar(
-                                                content: Text("Next Pressed"),
-                                              ));
-                                            },
-                                            child: const Text(
-                                              "Next",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                              ),
-                                            )),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
                             ],
                           ),
                         )),
