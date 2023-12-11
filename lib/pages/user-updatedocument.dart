@@ -1,24 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doits_internship_project/functions.dart';
 import 'package:doits_internship_project/pages/loginpage.dart';
+import 'package:doits_internship_project/pages/user-createdocument.dart';
 import 'package:doits_internship_project/pages/user-dashboard.dart';
 import 'package:doits_internship_project/pages/user-outbox.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
-class CreateDocumentPage extends StatefulWidget {
-  const CreateDocumentPage(
-      {super.key, required this.title, required this.username});
+class UpdateDocumentPage extends StatefulWidget {
+  const UpdateDocumentPage(
+      {super.key, required this.username, required this.document});
 
   final String username;
-  final String title;
+  final Document document;
 
   @override
-  State<CreateDocumentPage> createState() => _CreateDocumentPage();
+  State<UpdateDocumentPage> createState() => _UpdateDocumentPage();
 }
 
-class _CreateDocumentPage extends State<CreateDocumentPage> {
+class _UpdateDocumentPage extends State<UpdateDocumentPage> {
   var recipient;
 
   String code = "A";
@@ -36,6 +37,17 @@ class _CreateDocumentPage extends State<CreateDocumentPage> {
   final DateTime now = DateTime.now();
   final DateFormat formatter = DateFormat('MM-dd-yyyy');
   String formatted = "";
+
+  @override
+  void initState() {
+    recipient = widget.document.recipient;
+    subjectController.text = widget.document.subject;
+    descriptionController.text = widget.document.description;
+    remarksController.text = widget.document.remarks;
+    code = widget.document.code;
+    seriesController.text = widget.document.series;
+    super.initState();
+  }
 
   void _presentDatePicker() {
     // showDatePicker is a pre-made funtion of Flutter
@@ -296,8 +308,6 @@ class _CreateDocumentPage extends State<CreateDocumentPage> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(4),
-                                      color:
-                                          const Color.fromARGB(156, 27, 32, 61),
                                     ),
                                     padding: const EdgeInsets.all(8.0),
                                     child: const Row(
@@ -334,6 +344,8 @@ class _CreateDocumentPage extends State<CreateDocumentPage> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(4),
+                                      color:
+                                          const Color.fromARGB(156, 27, 32, 61),
                                     ),
                                     padding: const EdgeInsets.all(8.0),
                                     child: const Row(
@@ -379,7 +391,7 @@ class _CreateDocumentPage extends State<CreateDocumentPage> {
                                     const EdgeInsets.fromLTRB(20, 10, 10, 10),
                                 alignment: Alignment.centerLeft,
                                 child: const Text(
-                                  "Create Document",
+                                  "Update Document",
                                   style: TextStyle(
                                     color: Color.fromARGB(255, 25, 48, 100),
                                     fontSize: 26,
@@ -678,7 +690,8 @@ class _CreateDocumentPage extends State<CreateDocumentPage> {
                                             EdgeInsets.fromLTRB(6, 10, 6, 10),
                                         border: OutlineInputBorder(),
                                       ),
-                                    ),const Padding(
+                                    ),
+                                    const Padding(
                                       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                                       child: Align(
                                           alignment: Alignment.centerLeft,
@@ -1059,8 +1072,9 @@ class _CreateDocumentPage extends State<CreateDocumentPage> {
                                       print("Largest ID");
                                       print(largestID);
 
-                                      createDocument(
+                                      updateDocument(
                                           context: context,
+                                          id: widget.document.id,
                                           code: code,
                                           series: series,
                                           doits: doits,

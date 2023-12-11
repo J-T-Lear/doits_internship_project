@@ -1,9 +1,11 @@
 import 'package:doits_internship_project/pages/admin-userspage.dart';
 import 'package:doits_internship_project/pages/loginpage.dart';
+import 'package:doits_internship_project/functions.dart';
 import 'package:flutter/material.dart';
 
 class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key, required this.title, required this.username});
+  const AdminDashboard(
+      {super.key, required this.title, required this.username});
 
   final String username;
   final String title;
@@ -13,8 +15,15 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboard extends State<AdminDashboard> {
-  int _dropdownValue = 5;
+  String _dropdownValue = "id";
 
+  String searchcategory = "id";
+  String searchkey = "";
+  String selecteduser = "";
+
+  bool searchon = false;
+
+  final searchkeycontroller = TextEditingController();
   final FocusNode _buttonFocusNode = FocusNode(debugLabel: 'Menu Button');
   @override
   Widget build(BuildContext context) {
@@ -82,7 +91,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                           Icons.refresh_rounded,
                         ),
                       ),
-                    ), 
+                    ),
                     const VerticalDivider(
                       indent: 6,
                       endIndent: 6,
@@ -93,7 +102,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                       child: MenuAnchor(
                         childFocusNode: _buttonFocusNode,
                         menuChildren: <Widget>[
-                           MenuItemButton(
+                          MenuItemButton(
                             style: const ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(
                               Color.fromARGB(255, 25, 48, 100),
@@ -134,12 +143,12 @@ class _AdminDashboard extends State<AdminDashboard> {
                               Colors.white,
                             )),
                             onPressed: () {
-                             Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const LoginPage(title: "PEO"),
-                              ));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const LoginPage(title: "PEO"),
+                                  ));
                             },
                             child: const Row(
                               children: [
@@ -255,8 +264,9 @@ class _AdminDashboard extends State<AdminDashboard> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              AdminUsersPage(title: "PEO", username: widget.username),
+                                          builder: (context) => AdminUsersPage(
+                                              title: "PEO",
+                                              username: widget.username),
                                         ));
                                   },
                                   child: Container(
@@ -366,73 +376,120 @@ class _AdminDashboard extends State<AdminDashboard> {
                                     const EdgeInsets.fromLTRB(20, 10, 20, 10),
                                 child: Row(
                                   children: [
-                                    const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: Text("Show"),
-                                    ),
-                                    Container(
-                                        padding: const EdgeInsets.all(4),
-                                        height: 30,
-                                        width: 60,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(2),
-                                          color: Colors
-                                              .white, //background color of dropdown button
-                                          border: Border.all(
-                                              color: Colors.black38, width: 1),
-                                        ),
-                                        child: DropdownButton<int>(
-                                            items: const [
-                                              DropdownMenuItem(
-                                                value: 5,
-                                                child: Text("5"),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 10,
-                                                child: Text("10"),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 20,
-                                                child: Text("20"),
-                                              ),
-                                            ],
-                                            value: _dropdownValue,
-                                            underline: Container(),
-                                            onChanged: (int? selectedValue) {
-                                              if (selectedValue is int) {
-                                                setState(() {
-                                                  _dropdownValue =
-                                                      selectedValue;
-                                                });
-                                              }
-                                            })),
-                                    const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: Text("entries"),
-                                    ),
                                     const Spacer(
                                       flex: 10,
+                                    ),
+                                    const Padding(
+                                      padding: EdgeInsets.all(4.0),
+                                      child: Text("Search Catergory"),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0, 0, 10, 0),
+                                      child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          height: 30,
+                                          width: 120,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(2),
+                                            color: Colors
+                                                .white, //background color of dropdown button
+                                            border: Border.all(
+                                                color: Colors.black38,
+                                                width: 1),
+                                          ),
+                                          child: DropdownButton<String>(
+                                              isExpanded: true,
+                                              items: const [
+                                                DropdownMenuItem(
+                                                  value: "id",
+                                                  child: Text("ID"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "doits",
+                                                  child: Text("DoITS"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "sender",
+                                                  child: Text("Sender"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "recipient",
+                                                  child: Text("Recipient"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "subject",
+                                                  child: Text("Subject"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "datedue",
+                                                  child: Text("Due Date"),
+                                                ),
+                                              ],
+                                              value: _dropdownValue,
+                                              underline: Container(),
+                                              onChanged:
+                                                  (String? searchcategory) {
+                                                if (searchcategory is String) {
+                                                  setState(() {
+                                                    _dropdownValue =
+                                                        searchcategory;
+                                                  });
+                                                }
+                                              })),
                                     ),
                                     const Expanded(
                                       flex: 1,
                                       child: Text("Search: "),
                                     ),
-                                    const Expanded(
+                                    Expanded(
                                         flex: 3,
                                         child: SizedBox(
                                           height: 30,
-                                          child: TextField(
-                                            style: TextStyle(
+                                          child: TextFormField(
+                                            controller: searchkeycontroller,
+                                            style: const TextStyle(
                                                 fontSize: 12.0,
                                                 height: 1.0,
                                                 color: Colors.black),
-                                            decoration: InputDecoration(
+                                            decoration: const InputDecoration(
                                                 contentPadding:
                                                     EdgeInsets.all(4),
                                                 border: OutlineInputBorder()),
                                           ),
                                         )),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            10, 0, 0, 0),
+                                        child: searchon
+                                            ? ElevatedButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _dropdownValue = "id";
+                                                    searchkeycontroller.text =
+                                                        "";
+                                                    searchon = false;
+                                                  });
+                                                },
+                                                child: const Icon(Icons.clear))
+                                            : ElevatedButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    searchcategory =
+                                                        _dropdownValue;
+                                                    searchkey =
+                                                        searchkeycontroller
+                                                            .text;
+                                                    searchon = true;
+                                                  });
+                                                },
+                                                child:
+                                                    const Icon(Icons.search)),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -542,7 +599,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "Action",
+                                                "Sender",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
@@ -579,7 +636,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "Remarks",
+                                                "Recipient",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
@@ -616,7 +673,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "Other Remarks",
+                                                "Subject",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
@@ -653,7 +710,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "Description",
+                                                "Due Date",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
@@ -667,28 +724,61 @@ class _AdminDashboard extends State<AdminDashboard> {
                                   ],
                                 ),
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        height: 40,
-                                        color: const Color.fromARGB(
-                                            255, 226, 233, 236),
-                                        child: const Center(
-                                            child: Text(
-                                                "No Data Available in Table")),
-                                      ),
-                                    ),
-                                  ],
+                              Expanded(
+                                flex: 4,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                  child: searchon
+                                      ? StreamBuilder<List<Document>>(
+                                          stream: searchDocumentsAdmin(
+                                              searchcategory: searchcategory,
+                                              searchkey: searchkey),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasError) {
+                                              print(snapshot.error);
+                                              return const Text(
+                                                  'Something went wrong');
+                                            }
+                                            if (snapshot.hasData) {
+                                              final documents = snapshot.data!;
+
+                                              return buildDocumentsListViewAdmin(
+                                                  documents,
+                                                  context,
+                                                  widget.username);
+                                            } else {
+                                              return const Center(
+                                                  child:
+                                                      CircularProgressIndicator());
+                                            }
+                                          })
+                                      : StreamBuilder<List<Document>>(
+                                          stream: readDocumentsAdmin(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasError) {
+                                              print(snapshot.error);
+                                              return const Text(
+                                                  'Something went wrong');
+                                            }
+                                            if (snapshot.hasData) {
+                                              final documents = snapshot.data!;
+
+                                              return buildDocumentsListViewAdmin(
+                                                  documents,
+                                                  context,
+                                                  widget.username);
+                                            } else {
+                                              return const Center(
+                                                  child:
+                                                      CircularProgressIndicator());
+                                            }
+                                          }),
                                 ),
                               ),
-                             
                               Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                    const EdgeInsets.fromLTRB(20, 0, 20, 40),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -776,7 +866,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                                           ),
                                         ),
                                         child: const Text(
-                                          "Action",
+                                          "Sender",
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Color.fromARGB(
@@ -838,7 +928,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                                           ),
                                         ),
                                         child: const Text(
-                                          "Other Remarks",
+                                          "Remarks",
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Color.fromARGB(
@@ -869,7 +959,7 @@ class _AdminDashboard extends State<AdminDashboard> {
                                           ),
                                         ),
                                         child: const Text(
-                                          "Description",
+                                          "Due Date",
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Color.fromARGB(
@@ -881,103 +971,6 @@ class _AdminDashboard extends State<AdminDashboard> {
                                   ],
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                child: Row(
-                                  children: [
-                                    const Expanded(
-                                        flex: 8,
-                                        child: Text(
-                                            "Showing 0 to 0 of 0 entries")),
-                                    const Spacer(
-                                      flex: 18,
-                                    ),
-                                    Expanded(
-                                      flex: 4,
-                                      child: ElevatedButton(
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.white),
-                                              foregroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.white),
-                                              overlayColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.white),
-                                              shadowColor: MaterialStateProperty
-                                                  .all<Color>(Colors.white),
-                                              elevation: MaterialStateProperty
-                                                  .all<double>(0.1),
-                                              shape: MaterialStatePropertyAll(
-                                                  RoundedRectangleBorder(
-                                                      side: const BorderSide(
-                                                          width: 1, // thickness
-                                                          color: Colors.grey // color
-                                                          ),
-                                                      borderRadius: BorderRadius.circular(2)))),
-                                          onPressed: () {
-                                            ScaffoldMessenger.of(context)
-                                                .hideCurrentSnackBar();
-
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                              content: Text("Previous Pressed"),
-                                            ));
-                                          },
-                                          child: const Text(
-                                            "Previous",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12),
-                                          )),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            4, 0, 4, 0),
-                                        child: ElevatedButton(
-                                            style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty.all<Color>(
-                                                        Colors.white),
-                                                foregroundColor:
-                                                    MaterialStateProperty.all<Color>(
-                                                        Colors.white),
-                                                overlayColor: MaterialStateProperty
-                                                    .all<Color>(Colors.white),
-                                                shadowColor: MaterialStateProperty
-                                                    .all<Color>(Colors.white),
-                                                elevation: MaterialStateProperty
-                                                    .all<double>(0.1),
-                                                shape: MaterialStatePropertyAll(
-                                                    RoundedRectangleBorder(
-                                                        side: const BorderSide(
-                                                            width: 1, // thickness
-                                                            color: Colors.grey // color
-                                                            ),
-                                                        borderRadius: BorderRadius.circular(2)))),
-                                            onPressed: () {
-                                              ScaffoldMessenger.of(context)
-                                                  .hideCurrentSnackBar();
-
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(const SnackBar(
-                                                content: Text("Next Pressed"),
-                                              ));
-                                            },
-                                            child: const Text(
-                                              "Next",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                              ),
-                                            )),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
                             ],
                           ),
                         )),

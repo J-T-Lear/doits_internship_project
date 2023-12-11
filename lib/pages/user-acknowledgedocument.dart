@@ -1,36 +1,90 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doits_internship_project/functions.dart';
 import 'package:doits_internship_project/pages/loginpage.dart';
 import 'package:doits_internship_project/pages/user-createdocument.dart';
-import 'package:doits_internship_project/functions.dart';
+import 'package:doits_internship_project/pages/user-dashboard.dart';
 import 'package:doits_internship_project/pages/user-outbox.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
-class UserDashboard extends StatefulWidget {
-  const UserDashboard({super.key, required this.title, required this.username});
+class AcknowledgeDocumentPage extends StatefulWidget {
+  const AcknowledgeDocumentPage(
+      {super.key, required this.username, required this.document});
 
   final String username;
-  final String title;
+  final Document document;
 
   @override
-  State<UserDashboard> createState() => _UserDashboard();
+  State<AcknowledgeDocumentPage> createState() => _AcknowledgeDocumentPage();
 }
 
-class _UserDashboard extends State<UserDashboard> {
-  String _dropdownValue = "id";
+class _AcknowledgeDocumentPage extends State<AcknowledgeDocumentPage> {
+  var recipient;
 
-  String searchcategory = "id";
-  String searchkey = "";
-  String selecteduser = "";
+  String code = "A";
+  String series = "";
+  String largestID = "";
 
-  bool searchon = false;
+  String doits = "";
 
-  
-  final searchkeycontroller = TextEditingController();
+  DateTime selectedDate = DateTime.now();
+
+  final senderController = TextEditingController();
+  final doitsController = TextEditingController();
+  final datedueController = TextEditingController();
+  final datesentController = TextEditingController();
+  final subjectController = TextEditingController();
+  final seriesController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final remarksController = TextEditingController();
+  final statusController = TextEditingController();
+  final DateTime now = DateTime.now();
+  final DateFormat formatter = DateFormat('MM-dd-yyyy');
+  String formatted = "";
+
+  @override
+  void initState() {
+    senderController.text = widget.document.sender;
+    doitsController.text = widget.document.doits;
+    datedueController.text = widget.document.datedue;
+    datesentController.text = widget.document.datesent;
+    recipient = widget.document.recipient;
+    subjectController.text = widget.document.subject;
+    descriptionController.text = widget.document.description;
+    remarksController.text = widget.document.remarks;
+    code = widget.document.code;
+    seriesController.text = widget.document.series;
+    statusController.text = widget.document.status;
+    super.initState();
+  }
+
+  void _presentDatePicker() {
+    // showDatePicker is a pre-made funtion of Flutter
+    showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime.now(),
+            lastDate: DateTime(2100))
+        .then((pickedDate) {
+      // Check if no date is selected
+      if (pickedDate == null) {
+        return;
+      }
+      setState(() {
+        // using state so that the UI will be rerendered when date is picked
+        selectedDate = pickedDate;
+        formatted = formatter.format(pickedDate);
+      });
+    });
+  }
+
   final FocusNode _buttonFocusNode = FocusNode(debugLabel: 'Menu Button');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        children: <Widget>[
+        children: [
           Expanded(
               flex: 1,
               child: Container(
@@ -102,11 +156,11 @@ class _UserDashboard extends State<UserDashboard> {
                       flex: 1,
                       child: GestureDetector(
                         onTap: () {
-                           Navigator.push(
+                          Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    CreateDocumentPage(title: "PEO", username: widget.username),
+                                builder: (context) => CreateDocumentPage(
+                                    title: "PEO", username: widget.username),
                               ));
                         },
                         child: const Icon(
@@ -166,10 +220,18 @@ class _UserDashboard extends State<UserDashboard> {
                             )),
                             onPressed: () {
                               Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const LoginPage(title: "PEO"),
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const LoginPage(title: "PEO"),
+                                  ));
+
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();
+
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text("Logged Out"),
                               ));
                             },
                             child: const Row(
@@ -245,13 +307,13 @@ class _UserDashboard extends State<UserDashboard> {
                                 flex: 1,
                                 child: GestureDetector(
                                   onTap: () {
-                                    ScaffoldMessenger.of(context)
-                                        .hideCurrentSnackBar();
-
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
-                                      content: Text("Dashboard Pressed"),
-                                    ));
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => UserDashboard(
+                                              title: "PEO",
+                                              username: widget.username),
+                                        ));
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -279,21 +341,21 @@ class _UserDashboard extends State<UserDashboard> {
                                     ),
                                   ),
                                 )),
-                                Expanded(
+                            Expanded(
                                 flex: 1,
                                 child: GestureDetector(
                                   onTap: () {
-                                    
-                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    UserOutbox(title: "PEO", username: widget.username),
-                              ));
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => UserOutbox(
+                                              title: "PEO",
+                                              username: widget.username),
+                                        ));
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(4), 
+                                      borderRadius: BorderRadius.circular(4),
                                     ),
                                     padding: const EdgeInsets.all(8.0),
                                     child: const Row(
@@ -332,14 +394,14 @@ class _UserDashboard extends State<UserDashboard> {
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white,
                           ),
-                          child: Column(
+                          child: ListView(
                             children: [
                               Container(
                                 padding:
                                     const EdgeInsets.fromLTRB(20, 10, 10, 10),
                                 alignment: Alignment.centerLeft,
                                 child: const Text(
-                                  "Dashboard",
+                                  "Acknowledge Document",
                                   style: TextStyle(
                                     color: Color.fromARGB(255, 25, 48, 100),
                                     fontSize: 26,
@@ -348,179 +410,371 @@ class _UserDashboard extends State<UserDashboard> {
                                 ),
                               ),
                               const Divider(
-                                height: 2,
+                                height: 20,
                               ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                                alignment: Alignment.centerLeft,
-                                child: ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            const MaterialStatePropertyAll(
-                                          Color.fromARGB(255, 25, 48, 100),
-                                        ),
-                                        shape: MaterialStatePropertyAll(
-                                            RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(2)))),
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context)
-                                          .hideCurrentSnackBar();
-
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                        content: Text("Export Pressed"),
-                                      ));
-                                    },
-                                    child: const SizedBox(
-                                      width: 48,
-                                      height: 20,
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.upload_file_rounded,
-                                            color: Colors.white,
-                                            size: 12,
-                                          ),
-                                          Text(
-                                            "Export",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12),
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                              ),
-
-
                               Container(
                                 padding:
                                     const EdgeInsets.fromLTRB(20, 10, 20, 10),
                                 child: Row(
                                   children: [
-                                    
-                                    const Spacer(
-                                      flex: 9,
-                                    ),
-                                    const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: Text("Search Catergory"),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                      child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          height: 30,
-                                          width: 160,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(2),
-                                            color: Colors
-                                                .white, //background color of dropdown button
-                                            border: Border.all(
-                                                color: Colors.black38, width: 1),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text("From"),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.all(4),
+                                                height: 30,
+                                                width: 300,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(2),
+                                                  color: Colors
+                                                      .white, //background color of dropdown button
+                                                  border: Border.all(
+                                                      color: Colors.black38,
+                                                      width: 1),
+                                                ),
+                                                child: TextFormField(
+                                                  enabled: false,
+                                                  controller: senderController,
+                                                  style: const TextStyle(
+                                                      fontSize: 12.0,
+                                                      height: 1.0,
+                                                      color: Colors.black),
+                                                  decoration: const InputDecoration(
+                                                      contentPadding:
+                                                          EdgeInsets.all(4),
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          child: DropdownButton<String>(
-                                            isExpanded: true,
-                                              items: const [
-                                                DropdownMenuItem(
-                                                  value: "id",
-                                                  child: Text("ID"),
-                                                ),
-                                                DropdownMenuItem(
-                                                  value: "doits",
-                                                  child: Text("DoITS"),
-                                                ),
-                                                DropdownMenuItem(
-                                                  value: "sender",
-                                                  child: Text("Sender"),
-                                                ),
-                                                DropdownMenuItem(
-                                                  value: "subject",
-                                                  child: Text("Subject"),
-                                                ),
-                                                DropdownMenuItem(
-                                                  value: "status",
-                                                  child: Text("Status"),
-                                                ),
-                                                DropdownMenuItem(
-                                                  value: "datedue",
-                                                  child: Text("Due Date"),
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 10, 0, 0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Text("Subject"),
+                                                SizedBox(
+                                                  height: 30,
+                                                  width: 300,
+                                                  child: TextFormField(
+                                                    enabled: false,
+                                                    controller:
+                                                        subjectController,
+                                                    style: const TextStyle(
+                                                        fontSize: 12.0,
+                                                        height: 1.0,
+                                                        color: Colors.black),
+                                                    decoration:
+                                                        const InputDecoration(
+                                                            contentPadding:
+                                                                EdgeInsets.all(
+                                                                    4),
+                                                            border:
+                                                                OutlineInputBorder()),
+                                                  ),
                                                 ),
                                               ],
-                                              value: _dropdownValue,
-                                              underline: Container(),
-                                              onChanged: (String? searchcategory) {
-                                                if (searchcategory is String) {
-                                                  setState(() {
-                                                    _dropdownValue =
-                                                        searchcategory;
-                                                  });
-                                                }
-                                              })),
-                                    ), 
-                                    const Expanded(
-                                      flex: 1,
-                                      child: Text("Search: "),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                     Expanded(
-                                        flex: 3,
-                                        child: SizedBox(
-                                          height: 30,
-                                          child: TextFormField(
-                                            controller: searchkeycontroller,
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: Colors.black),
-                                            decoration: const InputDecoration(
-                                                contentPadding:
-                                                    EdgeInsets.all(4),
-                                                border: OutlineInputBorder()),
-                                          ),
-                                        )),
-                                    Expanded(
                                       flex: 1,
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                        child: searchon
-                                            ? ElevatedButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _dropdownValue = "id";
-                                                    searchkeycontroller.text = "";
-                                                    searchon = false;
-                                                  });
-                                                },
-                                                child: const Icon(Icons.clear))
-                                            : ElevatedButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    searchcategory = _dropdownValue;
-                                                    searchkey = searchkeycontroller.text; 
-                                                    searchon = true;
-                                                  });
-                                                },
-                                                child:
-                                                    const Icon(Icons.search)),
+                                      child: Column(
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text("DoITS"),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.all(4),
+                                                height: 30,
+                                                width: 300,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(2),
+                                                  color: Colors
+                                                      .white, //background color of dropdown button
+                                                  border: Border.all(
+                                                      color: Colors.black38,
+                                                      width: 1),
+                                                ),
+                                                child: TextFormField(
+                                                  enabled: false,
+                                                  controller: doitsController,
+                                                  style: const TextStyle(
+                                                      fontSize: 12.0,
+                                                      height: 1.0,
+                                                      color: Colors.black),
+                                                  decoration: const InputDecoration(
+                                                      contentPadding:
+                                                          EdgeInsets.all(4),
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 10, 0, 0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Text("Series"),
+                                                Container(
+                                                  width: 300,
+                                                  height: 30,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            2),
+                                                    color: Colors
+                                                        .white, //background color of dropdown button
+                                                    border: Border.all(
+                                                        color: Colors.black38,
+                                                        width: 1),
+                                                  ),
+                                                  child: TextFormField(
+                                                    enabled: false,
+                                                    controller:
+                                                        seriesController,
+                                                    style: const TextStyle(
+                                                        fontSize: 12.0,
+                                                        height: 1.0,
+                                                        color: Colors.black),
+                                                    decoration:
+                                                        const InputDecoration(
+                                                            contentPadding:
+                                                                EdgeInsets.all(
+                                                                    4),
+                                                            border:
+                                                                OutlineInputBorder()),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              0, 56, 0, 60),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text("Due Date"),
+                                              Container(
+                                                width: 300,
+                                                height: 30,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(2),
+                                                  color: Colors
+                                                      .white, //background color of dropdown button
+                                                  border: Border.all(
+                                                      color: Colors.black38,
+                                                      width: 1),
+                                                ),
+                                                child: TextFormField(
+                                                  enabled: false,
+                                                  controller: datedueController,
+                                                  style: const TextStyle(
+                                                      fontSize: 12.0,
+                                                      height: 1.0,
+                                                      color: Colors.black),
+                                                  decoration: const InputDecoration(
+                                                      contentPadding:
+                                                          EdgeInsets.all(4),
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                ),
+                                              ),
+                                              const Padding(
+                                                padding: EdgeInsets.fromLTRB(
+                                                    0, 10, 0, 0),
+                                                child: Text("Date Sent"),
+                                              ),
+                                              Container(
+                                                width: 300,
+                                                height: 30,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(2),
+                                                  color: Colors
+                                                      .white, //background color of dropdown button
+                                                  border: Border.all(
+                                                      color: Colors.black38,
+                                                      width: 1),
+                                                ),
+                                                child: TextFormField(
+                                                  enabled: false,
+                                                  controller:
+                                                      datesentController,
+                                                  style: const TextStyle(
+                                                      fontSize: 12.0,
+                                                      height: 1.0,
+                                                      color: Colors.black),
+                                                  decoration: const InputDecoration(
+                                                      contentPadding:
+                                                          EdgeInsets.all(4),
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ))
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                padding:
+                                    const EdgeInsets.all(10),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          children: [
+                                            const Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  0, 10, 0, 0),
+                                              child: Text("Status"),
+                                            ),
+                                            Container(
+                                              width: 300,
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(2),
+                                                color: Colors
+                                                    .white, //background color of dropdown button
+                                                border: Border.all(
+                                                    color: Colors.black38,
+                                                    width: 1),
+                                              ),
+                                              child: TextFormField(
+                                                enabled: false,
+                                                controller: statusController,
+                                                style: const TextStyle(
+                                                    fontSize: 12.0,
+                                                    height: 1.0,
+                                                    color: Colors.black),
+                                                decoration: const InputDecoration(
+                                                    contentPadding:
+                                                        EdgeInsets.all(4),
+                                                    border:
+                                                        OutlineInputBorder()),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(
+                                      flex: 2,
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                child: Column(
+                                  children: [
+                                    const Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text("Description: ")),
+                                    TextFormField(
+                                      enabled: false,
+                                      controller: descriptionController,
+                                      keyboardType: TextInputType.multiline,
+                                      minLines:
+                                          5, // Normal textInputField will be displayed
+                                      maxLines: 5, //
+                                      style: const TextStyle(
+                                          fontSize: 12.0,
+                                          height: 1.0,
+                                          color: Colors.black),
+                                      decoration: const InputDecoration(
+                                        contentPadding:
+                                            EdgeInsets.fromLTRB(6, 10, 6, 10),
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                    const Padding(
+                                      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                      child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text("Remarks: ")),
+                                    ),
+                                    TextFormField(
+                                      enabled: false,
+                                      controller: remarksController,
+                                      keyboardType: TextInputType.multiline,
+                                      minLines:
+                                          5, // Normal textInputField will be displayed
+                                      maxLines: 5, //
+                                      style: const TextStyle(
+                                          fontSize: 12.0,
+                                          height: 1.0,
+                                          color: Colors.black),
+                                      decoration: const InputDecoration(
+                                        contentPadding:
+                                            EdgeInsets.fromLTRB(6, 10, 6, 10),
+                                        border: OutlineInputBorder(),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              
-                             
+                              const Divider(
+                                height: 20,
+                              ),
+                              Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 10, 10, 10),
+                                alignment: Alignment.centerLeft,
+                                child: const Text(
+                                  "Files Attached",
+                                  style: TextStyle(
+                                    color: Color.fromARGB(255, 25, 48, 100),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
                               Padding(
                                 padding:
                                     const EdgeInsets.fromLTRB(20, 10, 20, 0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-
-
                                     Expanded(
                                       flex: 1,
                                       child: Container(
@@ -621,7 +875,7 @@ class _UserDashboard extends State<UserDashboard> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "Sender",
+                                                "Action",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
@@ -658,7 +912,7 @@ class _UserDashboard extends State<UserDashboard> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "Subject",
+                                                "Remarks",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
@@ -695,7 +949,7 @@ class _UserDashboard extends State<UserDashboard> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "Status",
+                                                "Other Remarks",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
@@ -732,7 +986,7 @@ class _UserDashboard extends State<UserDashboard> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "Due Date",
+                                                "Description",
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Color.fromARGB(
@@ -743,253 +997,77 @@ class _UserDashboard extends State<UserDashboard> {
                                             ],
                                           )),
                                     ),
-
-                                    
                                   ],
                                 ),
                               ),
-
-
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                child: searchon
-                                    ? StreamBuilder<List<Document>>(
-                                        stream: searchDocumentsUserRecipient(username: widget.username, searchcategory: searchcategory, searchkey: searchkey),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.hasError) {
-                                            print(snapshot.error);
-                                            return const Text(
-                                                'Something went wrong');
-                                          }
-                                          if (snapshot.hasData) {
-                                            final documents = snapshot.data!;
-                                
-                                            return buildDocumentsListViewDashboard(documents, context, widget.username);
-                                           
-                                          } else {
-                                            return const Center(
-                                                child:
-                                                    CircularProgressIndicator());
-                                          }
-                                        })
-                                    : StreamBuilder<List<Document>>(
-                                        stream: readDocumentsUserRecipient(username: widget.username),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.hasError) {
-                                            print(snapshot.error);
-                                            return const Text(
-                                                'Something went wrong');
-                                          }
-                                          if (snapshot.hasData) {
-                                            final documents = snapshot.data!;
-                                
-                                            return buildDocumentsListViewDashboard(documents, context, widget.username);
-                                           
-                                          } else {
-                                            return const Center(
-                                                child:
-                                                    CircularProgressIndicator());
-                                          }
-                                        }),
-                              ),
-                             
-
-
                               Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                    const EdgeInsets.fromLTRB(20, 0, 20, 20),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Expanded(
-                                      flex: 1,
                                       child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "ID",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "DoITS",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "Sender",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "Subject",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "Status",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 10, 4, 10),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                                width: 2,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                            bottom: BorderSide(
-                                                width: 3,
-                                                color: Color.fromARGB(
-                                                    255, 207, 216, 220)),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "Due Date",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 25, 48, 100),
-                                          ),
-                                        ),
+                                        height: 40,
+                                        color: const Color.fromARGB(
+                                            255, 226, 233, 236),
+                                        child: const Center(
+                                            child: Text(
+                                                "No Data Available in Table")),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ), 
+                              ),
+                              const Divider(
+                                height: 12,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 0, 20, 40),
+                                child: ElevatedButton(
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            const MaterialStatePropertyAll(
+                                          Color.fromARGB(255, 25, 48, 100),
+                                        ),
+                                        shape: MaterialStatePropertyAll(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(2)))),
+                                    onPressed: () async {
+                                      acknowledgeDocument(
+                                          context: context,
+                                          id: widget.document.id);
+
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  UserDashboard(
+                                                      title: "PEO",
+                                                      username:
+                                                          widget.username)));
+                                    },
+                                    child: const SizedBox(
+                                      width: 90,
+                                      height: 20,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.done,
+                                            color: Colors.white,
+                                            size: 12,
+                                          ),
+                                          Text(
+                                            "Acknowledge",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12),
+                                          )
+                                        ],
+                                      ),
+                                    )),
+                              ),
                             ],
                           ),
                         )),
